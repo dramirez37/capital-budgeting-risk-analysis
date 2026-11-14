@@ -1,0 +1,36 @@
+{
+  "optimization": {
+    "combinations_evaluated": 1024,
+    "feasible_portfolios": 451,
+    "optimal_projects": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "H",
+      "J"
+    ],
+    "optimal_npv_usd": 597325,
+    "selected_cost_usd": 4860832,
+    "unspent_budget_usd": 139168,
+    "unique_optimum": true
+  },
+  "simulation": {
+    "seed": 2026,
+    "trials": 500,
+    "mean_npv_usd": 98620.76304289595,
+    "median_npv_usd": 92478.09660857555,
+    "std_npv_usd": 139652.34023535607,
+    "loss_count": 132,
+    "loss_fraction": 0.264,
+    "loss_fraction_95ci_normal_approx": [
+      0.2253622400649313,
+      0.3026377599350687
+    ],
+    "fifth_percentile_npv_usd": -99532.2670138375,
+    "ninety_fifth_percentile_npv_usd": 327495.9464144936,
+    "min_npv_usd": -308612.1060011893,
+    "max_npv_usd": 595378.8258579846,
+    "baseline_npv_usd": -193822.72953132872
+  }
+}

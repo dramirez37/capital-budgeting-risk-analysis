@@ -1,0 +1,52 @@
+name: Verify financial model
+on:
+  push:
+  pull_request:
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: python -m unittest discover -s tests -v
+      - run: python scripts/verify_models.py
+      - name: Validate numerical agreement with the published snapshot
+        run: |
+          git show HEAD:data/validation_results.json > /tmp/published_results.json
+          git show HEAD:data/simulated_scenarios.csv > /tmp/published_scenarios.csv
+          python - <<'PY'
+          import csv, json, math
+
+          with open('/tmp/published_results.json') as f: expected = json.load(f)
+          with open('data/validation_results.json') as f: actual = json.load(f)
+
+          def compare(a, b, path='root'):
+              if isinstance(a, dict):
+                  assert a.keys() == b.keys(), path
+                  for k in a: compare(a[k], b[k], path + '.' + k)
+              elif isinstance(a, list):
+                  assert len(a) == len(b), path
+                  for i, (x, y) in enumerate(zip(a, b)): compare(x, y, path + str(i))
+              elif isinstance(a, (int, float)) and not isinstance(a, bool):
+                  assert math.isclose(a, b, rel_tol=1e-12, abs_tol=1e-6), path
+              else:
+                  assert a == b, path
+
+          compare(expected, actual)
+          with open('/tmp/published_scenarios.csv', newline='') as f:
+              old_rows = list(csv.DictReader(f))
+          with open('data/simulated_scenarios.csv', newline='') as f:
+              new_rows = list(csv.DictReader(f))
+          assert len(old_rows) == len(new_rows) == 500
+          for i, (a, b) in enumerate(zip(old_rows, new_rows)):
+              assert a.keys() == b.keys(), i
+              for key in a:
+                  assert math.isclose(float(a[key]), float(b[key]),
+                                      rel_tol=1e-12, abs_tol=1e-6), (i, key)
+          print('Published snapshots agree within numerical tolerance.')
+          PY

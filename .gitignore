@@ -1,0 +1,13 @@
+# Python-generated artifacts and local environments
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+.env
+.env.*
+# Excel temporary/auto-recovery files
+~$*
+*.tmp
+*.xlsm
+# Historical private academic sources (not public deliverables)
+Project1_Ramirez*
